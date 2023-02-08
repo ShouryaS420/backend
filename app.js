@@ -14,4 +14,5 @@ app.use("/api/v1", User);
 
 app.get("/", (req, res) => {
     res.send("Server is working");
+    console.log("Some Changes");
 });
