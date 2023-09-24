@@ -1,6 +1,6 @@
-export const sendToken = (res, user, statusCode, message) => {
+export const sendToken = (res, register, statusCode, message) => {
 
-    const token = user.getJWTToken();
+    const token = register.getJWTToken();
 
     const options = {
         httpOnly: true,
@@ -8,18 +8,19 @@ export const sendToken = (res, user, statusCode, message) => {
     };
 
     const userData = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        city: user.city,
-        mobile: user.mobile,
-        password: user.password,
-        verified: user.verified,
+        _id: register._id,
+        fullName: register.fullName,
+        userName: register.userName,
+        email: register.email,
+        password: register.password,
+        mobileNumber: register.mobileNumber,
+        otp: register.otp,
+        verified: register.verified,
     };
 
     res
         .status(statusCode)
         .cookie("token", token, options)
-        .json({ success: true, message, user: userData });
+        .json({ success: true, message, register: userData });
 
 };

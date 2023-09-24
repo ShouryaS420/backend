@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import { Register } from "../models/register.js";
+import { TeamMember } from "../models/teamMember.js";
 
-export const isAuthenticated = async (req, res, next) => {
+export const isAuthenticatedTeam = async (req, res, next) => {
     try {
         const { token } = req.cookies;
 
@@ -11,10 +11,10 @@ export const isAuthenticated = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.register = await Register.findById(decoded._id);
+        req.teamMember = await TeamMember.findById(decoded._id);
 
         next();
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: `sadfsdfsdfsdf, ${error.message}` });
     }
 };
