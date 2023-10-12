@@ -4,6 +4,7 @@ import Group from "./routers/Group.js";
 import Messages from "./routers/Messages.js";
 import Post from "./routers/Post.js";
 import PostVideo from "./routers/PostVideo.js";
+import Comment from "./routers/Comment.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -19,8 +20,9 @@ app.use("/api/group", Group);
 app.use("/api/message", Messages);
 app.use("/api/post", Post);
 app.use("/api/postVideo", PostVideo);
+app.use("/api/comments", Comment);
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("Server is working");
   console.log("Some Changes");
 });

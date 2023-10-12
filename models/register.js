@@ -7,22 +7,27 @@ const registerSchema = new mongoose.Schema({
   fullName: {
     type: String,
     required: true,
+    default: 'sdfsdfsd',
   },
   userName: {
     type: String,
     required: true,
+    default: 'sdfsdfsd',
   },
   email: {
     type: String,
     required: true,
+    default: 'sdfsdfsd',
   },
   password: {
     type: String,
     required: true,
+    default: 'sdfsdfsd',
   },
   mobileNumber: {
     type: String,
     required: true,
+    default: 'sdfsdfsd',
   },
   otp: {
     type: String,
@@ -45,6 +50,8 @@ const registerSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   otp: Number,
   loginOtp: Number,
   otp_expiry: Date,

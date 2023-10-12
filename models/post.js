@@ -43,10 +43,23 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  userName: {
+    type: String,
+    required: true,
+  },
+  userPro: {
+    type: String,
+    required: true,
+  },
   multipleImageURI: [String],
   imageType: {
     type: String,
     required: true,
+  },
+  likesBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  likes: {
+    type: Number,
+    default: '0',
   },
   createdAt: {
     type: Date,
