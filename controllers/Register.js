@@ -16,15 +16,15 @@ export const createUser = async (req, res) => {
       profileImage,
     } = req.body;
 
-    let register = await Register.find({ userName });
+    let register = await Register.findOne({ mobileNumber });
 
     const otp = Math.floor(Math.random() * 1000000);
 
-    // if (register) {
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: `This User Name 😠 "${userName}" 😠 already exists` });
-    // }
+    if (register) {
+      return res
+        .status(400)
+        .json({ success: false, message: `This mobile 😠 "${mobileNumber}" 😠 already exists` });
+    }
 
     register = await Register.create({
       fullName,
@@ -44,6 +44,25 @@ export const createUser = async (req, res) => {
       201,
       `OTP has sent you Mobile Number ${mobileNumber}`
     );
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const checkUserExistByUserName = async (req, res) => {
+  try {
+    const { userName } = req.body;
+
+    let register = await Register.findOne({ userName });
+
+    if (register) {
+      return res
+        .status(400)
+        .json({ success: false, message: `This User Name 😠 "${userName}" 😠 already exists` });
+    }
+
+    res.status(200).json({ success: true, message: `This User Name "${userName}" not exist` });
+
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -78,7 +97,7 @@ export const sendOTPToPhUNLogin = async (req, res) => {
     const user = await Register.findOne({
       $or: [
         { mobileNumber: searchQuery },
-        // { email: searchQuery },
+        { email: searchQuery },
         { userName: searchQuery },
       ],
     });
@@ -289,11 +308,11 @@ export const followUser = async (req, res) => {
         .json({ message: "You are already following this user" });
     }
 
-    currentUser.following.push(followingUserID);
-    await currentUser.save();
+    userToUnfollow.followers.push(currentUserID);
+    await userToUnfollow.save();
 
     const userToFollow = await Register.findById(currentUserID);
-    userToFollow.followers.push(followingUserID);
+    userToFollow.following.push(followingUserID);
     await userToFollow.save();
 
     res.json({ message: "Followed successfully" });
@@ -306,28 +325,37 @@ export const followUser = async (req, res) => {
 export const unFollowUser = async (req, res) => {
   try {
     const { currentUserID, followingUserID } = req.params;
-    const currentUser = await Register.findById(currentUserID); // Assume user is authenticated and user object is available in req
+
+    // Find the current user and the user to unfollow
+    const currentUser = await Register.findById(currentUserID);
     const userToUnfollow = await Register.findById(followingUserID);
 
-    if (!userToUnfollow) {
-      return res.status(404).json({ message: "User not found" });
+    if (!currentUser || !userToUnfollow) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Remove the user from following and followers lists for both users
-    currentUser.following = currentUser.following.filter(
-      (id) => id.toString() !== userToUnfollow._id.toString()
-    );
-    userToUnfollow.followers = userToUnfollow.followers.filter(
-      (id) => id.toString() !== currentUser._id.toString()
-    );
+    console.log('Before Unfollow:');
+    console.log('currentUser.following:', currentUser.following);
+    console.log('userToUnfollow.followers:', userToUnfollow.followers);
 
+    // Remove the user to unfollow from the current user's following list
+    currentUser.following = currentUser.following.filter(_id => _id.toString() !== followingUserID);
+
+    // Explicitly update the userToUnfollow document
+    userToUnfollow.followers = userToUnfollow.followers.filter(_id => _id.toString() !== currentUserID);
+    await userToUnfollow.save(); // Save the updated userToUnfollow document
+
+    console.log('After Unfollow:');
+    console.log('currentUser.following:', currentUser.following);
+    console.log('userToUnfollow.followers:', userToUnfollow.followers);
+
+    // Save the current user document
     await currentUser.save();
-    await userToUnfollow.save();
 
-    res.json({ message: "Unfollowed successfully" });
+    res.json({ message: 'Unfollowed successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -366,6 +394,28 @@ export const getTotalFollowingCount = async (req, res) => {
     const totalFollowingCount = currentUser.following.length;
 
     res.json({ message: totalFollowingCount });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+
+}
+
+export const getTotalFollowerCount = async (req, res) => {
+  try {
+    // Find the current user by their ID
+    const { currentUserId } = req.params;
+    const currentUser = await Register.findById(currentUserId);
+
+    if (!currentUser) {
+      return res.status(404).json({ message: "0" });
+    }
+
+    // Get the total count of following users
+    const totalfollowersCount = currentUser.followers.length;
+
+    res.json({ message: totalfollowersCount });
 
   } catch (error) {
     console.error(error);

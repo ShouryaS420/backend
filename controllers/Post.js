@@ -3,7 +3,7 @@ import { sendToken2 } from "../utils/sendToken2.js";
 
 export const postImg = async (req, res) => {
   try {
-    const { userID, location, imageURI, userName, userPro, multipleImageURI, caption, imageType } = req.body;
+    const { userID, location, imageURI, videoURI, userName, userPro, multipleImageURI, videoDuration, caption, postType } = req.body;
     // const multipleImageURI = req.map(file => file.buffer.toString('base64'));
     
     let post = await Post.findOne({ location });
@@ -14,10 +14,12 @@ export const postImg = async (req, res) => {
         location,
         caption,
         imageURI,
+        videoURI,
         userName,
         userPro,
-        multipleImageURI, // Store the array of image base64 strings
-        imageType,
+        multipleImageURI,
+        videoDuration,
+        postType,
       });
       
       res.status(200).json({ success: true, message: post });
@@ -25,7 +27,7 @@ export const postImg = async (req, res) => {
         //   res.status(400).json({ success: false, message: "Post with the same location already exists." });
         // }
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error });
   }
 };
 
@@ -41,10 +43,59 @@ export const getPostImg = async (req, res) => {
   }
 }
 
+export const getPostImgByIDandGetLikes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const message = await Post.findById(id)
+    
+    res.json(message.likes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+}
+
+export const getPostImgByPostType1 = async (req, res) => {
+  try {
+    const { userID, videoURI } = req.params;
+    const message = await Post.find({ userID, videoURI });
+    
+    res.json(message);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+}
+
+export const getPostImgByPostType2 = async (req, res) => {
+  try {
+    const { userID, imageURI } = req.params;
+    const message = await Post.find({ userID, imageURI });
+    
+    res.json(message);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+}
+
+export const getPostImgByPostType3 = async (req, res) => {
+  try {
+    const { postType } = req.params;
+    const message = await Post.find({ postType });
+    
+    res.json(message);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching post' });
+  }
+}
+
 export const getPostAllImg = async (req, res) => {
   try {
-    const { userID } = req.params;
-    const post = await Post.find();
+    // const { userID } = req.params;
+    // const post = await Post.find();
+    const post = await Post.find().sort({ createdAt: -1 }).exec();
 
     if (!post) {
       return res.status(404).json({ message: "0" });
@@ -97,7 +148,7 @@ export const following = async (req, res) => {
     // Check if the following user ID is present in the current user's following list
     const isFollowing = currentUser.likesBy.includes(likeById);
 
-    res.json({ message: isFollowing });
+    res.json({ message: isFollowing, id1: id });
 
   } catch (error) {
     console.error(error);

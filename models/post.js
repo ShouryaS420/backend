@@ -41,7 +41,11 @@ const postSchema = new mongoose.Schema({
   },
   imageURI: {
     type: String,
-    required: true,
+    default: 'no',
+  },
+  videoURI: {
+    type: String,
+    default: 'no',
   },
   userName: {
     type: String,
@@ -52,7 +56,11 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   multipleImageURI: [String],
-  imageType: {
+  videoDuration: {
+    type: String,
+    default: '0',
+  },
+  postType: {
     type: String,
     required: true,
   },
@@ -67,4 +75,4 @@ const postSchema = new mongoose.Schema({
   },
 });
 
-export const Post = mongoose.model("post-image", postSchema);
+export const Post = mongoose.model("post", postSchema);

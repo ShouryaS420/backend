@@ -2,6 +2,7 @@ import express from "express";
 import {
   createUser,
   verify,
+  checkUserExistByUserName,
   sendOTPToPhUNLogin,
   checkOTP,
   getUser,
@@ -16,6 +17,7 @@ import {
   unFollowUser,
   following,
   getTotalFollowingCount,
+  getTotalFollowerCount,
 } from "../controllers/Register.js";
 import { isAuthenticated } from "../middleware/auth.js";
 
@@ -23,6 +25,7 @@ const router = express.Router();
 
 router.route("/createUser").post(createUser);
 router.route("/verify").post(isAuthenticated, verify);
+router.route("/checkUserExistByUserName").post(checkUserExistByUserName);
 router.route("/sendOTPToPhUNLogin").post(sendOTPToPhUNLogin);
 router.route("/checkOTP").post(checkOTP);
 router.route("/getUser").get(getUser);
@@ -39,5 +42,6 @@ router.route("/follow/:currentUserID/:followingUserID").post(followUser);
 router.route("/unFollowUser/:currentUserID/:followingUserID").post(unFollowUser);
 router.route("/following/:currentUserId/:followingUserId").get(following);
 router.route("/getTotalFollowingCount/:currentUserId").post(getTotalFollowingCount);
+router.route("/getTotalFollowerCount/:currentUserId").post(getTotalFollowerCount);
 
 export default router;

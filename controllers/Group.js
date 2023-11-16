@@ -3,7 +3,7 @@ import { sendToken2 } from "../utils/sendToken2.js";
 
 export const createGroup = async (req, res) => {
   try {
-    const { userID, groupName, groupPrivacySetting, profilePhoto, coverPhoto, description } = req.body;
+    const { userID, groupName, groupPrivacySetting } = req.body;
 
     let group = await Group.findOne({ groupName });
 
@@ -22,7 +22,7 @@ export const createGroup = async (req, res) => {
       description
     });
 
-    res.status(500).json({ success: false, message: group });
+    res.status(200).json({ success: false, message: group.message });
 
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -32,20 +32,19 @@ export const createGroup = async (req, res) => {
 export const updateGroup = async (req, res) => {
   try {
     const { id } = req.params;
-    const { description } = req.body;
-
-    const updatedProject = await Group.findByIdAndUpdate(
-      id,
-      { description: description },
-      { new: true }
-    );
+    const { description, profilePhoto, coverPhoto } = req.body;
   
-    if (!updatedProject) {
-      return res.status(404).json({ message: 'Project not found' });
+    const updatedGroup = await Group.findByIdAndUpdate(id, {
+      description: description,
+      profilePhoto: profilePhoto,
+      coverPhoto: coverPhoto,
+    }, { new: true });
+  
+    if (!updatedGroup) {
+      return res.status(404).json({ message: 'Group not found' });
     }
   
-    res.json(updatedProject);
-
+    res.json(updatedGroup);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -55,6 +54,17 @@ export const getGroup = async (req, res) => {
   const { userID } = req.params;
   try {
     const group = await Group.find({ userID });
+    res.json(group);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching group by userID' });
+  }
+};
+
+export const getGroupByID = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const group = await Group.findById(id);
     res.json(group);
   } catch (err) {
     console.error(err);

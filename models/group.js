@@ -6,15 +6,12 @@ const Schema = mongoose.Schema;
 const groupSchema = new mongoose.Schema({
   userID: {
     type: String,
-    required: true,
   },
   groupName: {
     type: String,
-    required: true,
   },
   groupPrivacySetting: {
     type: String,
-    required: true,
   },
   profilePhoto: {
     type: String,
